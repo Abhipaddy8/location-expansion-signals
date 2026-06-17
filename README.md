@@ -1,13 +1,16 @@
 # Location-Expansion Signals
 
-A Python connector that detects **company location-expansion** events from public sources,
-corroborates them across independent source types, and **idempotently builds a signal database**.
+A Python connector that detects **company location-expansion** events for a configured set of companies,
+corroborates them across independent public sources, and **idempotently builds a signal database**.
 Each result is emitted as a structured `location_expansion` signal in a GTM-signal envelope
 (modelled on the [Signalbase](https://docs.trysignalbase.com/) API shape).
 
 > Pipeline: `discover → normalize → resolve → corroborate → emit → persist`.
 > Deterministic core (no LLM in the hot path) · idempotent single-run · structured run summary.
 > **No API keys required** — it scrapes public job boards + news feeds.
+> **Scope:** verifies/structures expansions for companies listed in `config/sources.yaml` — not an
+> open-web crawler. See [Scope](#scope-this-is-a-connector-not-open-world-discovery) and
+> [Running it across many companies](#running-it-across-many-companies-scaling-off-greenhouse).
 
 ---
 
@@ -69,18 +72,70 @@ signal-connector serve       # read-only feed at http://127.0.0.1:8000
 
 Full design notes in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## Scope & honest limitations
+## Scope: this is a connector, not open-world discovery
 
-- **Curated company set.** The pipeline is demonstrated on a fixed set in `config/sources.yaml`,
-  working from known expansions to exercise the output shape and quality logic on real data. Scaling
-  discovery to an open universe is a separate (larger) problem.
+**Read this before assuming more than it does.** This tool is pointed at a **curated set of companies**
+in `config/sources.yaml`, each with the metro to watch. For each one it scrapes *that* company's board
++ news, corroborates, and structures the result. The detection and corroboration are **real and run
+live** — but the *selection of which companies* is configured. It does **not** crawl all job boards to
+discover unknown expanders on its own.
+
+That's deliberate: it isolates and proves the two hard, reusable parts — **conforming to the signal
+schema** and **the corroboration/quality logic on real data**. Turning it into open-world discovery is
+a well-defined extension, described below.
+
+Other honest limits:
 - **Config-anchored entity resolution.** Companies carry their canonical identity in config; a
   production system would resolve against a company graph.
-- **Heuristic confidence.** The score is a transparent, tunable formula (`settings.py`), not calibrated
-  against ground truth.
+- **Heuristic confidence.** A transparent, tunable formula (`settings.py`), not calibrated to ground truth.
 - **Unverified is intentional.** Kaseya stays `unverified` because news names its expansion "Silicon
   Valley" while the job board says "Sunnyvale" and no source independently confirmed it — the system
-  discriminates rather than rubber-stamps. (Metro aliasing resolves Anduril/Cato; Kaseya does not clear.)
+  discriminates rather than rubber-stamps.
+
+## Adding a company
+
+If you know a company uses Greenhouse and has a new metro, add an entry to `config/sources.yaml`:
+
+```yaml
+- name: Acme
+  slug: acme
+  domain: acme.com
+  industry: saas
+  country: US
+  hq: {city: San Francisco, region: CA, country: US}
+  greenhouse: acme              # the boards.greenhouse.io/<slug> board slug
+  watch_metros: ["Austin, TX"]
+  metro_aliases: ["Central Texas"]   # alt names news may use for the same place
+```
+
+Re-run — it's idempotent, so it just adds Acme without disturbing the rest. (Lever/Ashby slugs work the
+same via `lever:` / `ashby:`.)
+
+## Running it across many companies (scaling off Greenhouse)
+
+The engine already scales — pluggable sources, idempotent store, safe to run on any schedule. Going from
+"verify known expansions" to "**discover** unknown ones" is two additions:
+
+**1. Get a universe of board slugs.** Greenhouse's public API is per-board
+(`https://boards-api.greenhouse.io/v1/boards/{slug}/jobs` — no auth, returns every posting with
+`location.name`). There is **no global "list all boards" endpoint**, so you assemble a slug list from:
+company-name → slug guessing (lowercase, no spaces — works surprisingly often), public Greenhouse-customer
+lists, job aggregators, or an existing company database. One slug per company is all the connector needs.
+
+**2. Scan all metros + detect "new".** Today each company has a `watch_metros` allow-list. To discover,
+drop the allow-list and instead, per board:
+- cluster **every** posting by metro, dropping HQ and remote (the `processing/` layer already normalizes
+  locations, strips remote, and classifies roles);
+- flag a metro as a **candidate expansion** when it has a cluster of *expansion-indicating* roles —
+  Site Lead, Office Manager, GM, facilities, construction, on-site engineering (`processing/roles.py`).
+  Those role types signal *standing up a physical location*, which is the cold-start heuristic when you
+  have no history;
+- for higher precision, add a **baseline diff**: the `observations` table already timestamps every
+  observation, so a metro that appears this run but wasn't there N weeks ago = genuinely *new*.
+
+Everything downstream — corroboration, confidence, idempotent persistence, the run summary — stays
+unchanged. Point that at a large slug universe on a schedule and it continuously surfaces *newly
+appearing* metros, corroborated by news, in the same envelope.
 
 ## License
 
