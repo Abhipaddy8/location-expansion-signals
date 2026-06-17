@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Google News</title>
+    <item>
+      <title>Intercom opens Berlin AI R&amp;D hub with 100 hires</title>
+      <link>https://tech.eu/2025/10/29/intercom-berlin</link>
+      <description>Intercom is expanding to Berlin with a new AI research hub.</description>
+      <pubDate>Wed, 29 Oct 2025 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Intercom opens Berlin AI R&amp;D hub (syndicated)</title>
+      <link>https://tech.eu/2025/10/29/intercom-berlin?utm_source=feed</link>
+      <description>Syndicated reprint mentioning Berlin.</description>
+      <pubDate>Wed, 29 Oct 2025 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Intercom adds account executives in Dublin</title>
+      <link>https://example.com/intercom-dublin</link>
+      <description>Sales hiring in Dublin, Ireland.</description>
+      <pubDate>Tue, 28 Oct 2025 09:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Intercom's new Berlin office to scale to 100 staff</title>
+      <link>https://eu-startups.com/intercom-berlin-hub</link>
+      <description>The Berlin hub will focus on AI infrastructure.</description>
+      <pubDate>Thu, 30 Oct 2025 08:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

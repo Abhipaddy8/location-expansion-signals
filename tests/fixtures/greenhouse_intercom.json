@@ -1,0 +1,34 @@
+{
+  "jobs": [
+    {
+      "title": "AI Design Leader",
+      "location": {
+        "name": "Berlin, Germany; Dublin, Ireland; London, England"
+      }
+    },
+    {
+      "title": "AI Infrastructure Engineer",
+      "location": {
+        "name": "Berlin, Germany"
+      }
+    },
+    {
+      "title": "Senior Machine Learning Scientist",
+      "location": {
+        "name": "Berlin, Germany"
+      }
+    },
+    {
+      "title": "Remote Sales Rep",
+      "location": {
+        "name": "Remote - US"
+      }
+    },
+    {
+      "title": "Account Executive",
+      "location": {
+        "name": "Dublin, Ireland"
+      }
+    }
+  ]
+}

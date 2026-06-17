@@ -1,0 +1,70 @@
+# Source + company config (config-anchored entity resolution).
+# Each company carries its canonical identity (so news matches a known entity), its ATS
+# board, and the candidate new metro(s) to detect. Verified live 2026-06-17.
+
+sources:
+  greenhouse:
+    enabled: true
+  news:
+    enabled: true
+  press:
+    enabled: true
+  econdev:
+    enabled: true
+
+companies:
+  - name: Intercom
+    slug: intercom
+    domain: intercom.com
+    industry: customer service / ai saas
+    country: US
+    hq: {city: San Francisco, region: CA, country: US}
+    greenhouse: intercom
+    watch_metros: ["Berlin, Germany"]
+
+  - name: Cato Networks
+    slug: cato-networks
+    domain: catonetworks.com
+    industry: network security (sase)
+    country: IL
+    hq: {city: Tel Aviv, country: IL}
+    greenhouse: catonetworks
+    watch_metros: ["London, England"]
+
+  - name: Kaseya
+    slug: kaseya
+    domain: kaseya.com
+    industry: it management / msp software
+    country: US
+    hq: {city: Miami, region: FL, country: US}
+    greenhouse: kaseya
+    watch_metros: ["Sunnyvale, CA"]
+    metro_aliases: ["Silicon Valley", "Bay Area"]
+
+  - name: StarRez
+    slug: starrez
+    domain: starrez.com
+    industry: student-housing saas
+    country: US
+    hq: {city: Denver, region: CO, country: US}
+    greenhouse: starrez
+    watch_metros: ["Hyderabad, India"]
+
+  - name: xAI
+    slug: xai
+    domain: x.ai
+    industry: ai / frontier models
+    country: US
+    hq: {city: Palo Alto, region: CA, country: US}
+    greenhouse: xai
+    watch_metros: ["Memphis, TN"]
+
+  - name: Anduril Industries
+    slug: anduril
+    domain: anduril.com
+    industry: defense tech / autonomous systems
+    country: US
+    hq: {city: Costa Mesa, region: CA, country: US}
+    greenhouse: andurilindustries
+    watch_metros: ["Ashville, Ohio"]
+    metro_aliases: ["Columbus", "Ohio", "Pickaway", "Arsenal-1"]
